@@ -1,9 +1,9 @@
 const store = {
   items: [
-    { id: cuid(), name: 'apples', checked: false },
-    { id: cuid(), name: 'oranges', checked: false },
-    { id: cuid(), name: 'milk', checked: true },
-    { id: cuid(), name: 'bread', checked: false }
+    { id: cuid(), name: 'apples', checked: false, editName: "" },
+    { id: cuid(), name: 'oranges', checked: false, editName: "" },
+    { id: cuid(), name: 'milk', checked: true, editName: ""},
+    { id: cuid(), name: 'bread', checked: false, editName: "" }
   ],
   hideCheckedItems: false
 };
@@ -22,6 +22,9 @@ const generateItemElement = function (item) {
       <div class='shopping-item-controls'>
         <button class='shopping-item-toggle js-item-toggle'>
           <span class='button-label'>check</span>
+        </button>
+        <button class='shopping-item-edit js-item-edit'>
+        <span class='button-label'>edit</span>
         </button>
         <button class='shopping-item-delete js-item-delete'>
           <span class='button-label'>delete</span>
@@ -63,7 +66,7 @@ const render = function () {
 };
 
 const addItemToShoppingList = function (itemName) {
-  store.items.push({ id: cuid(), name: itemName, checked: false });
+  store.items.push({ id: cuid(), name: itemName, checked: false, editName: "" });
 };
 
 const handleNewItemSubmit = function () {
@@ -75,6 +78,14 @@ const handleNewItemSubmit = function () {
     render();
   });
 };
+
+const itemEdit = function (id) {
+  const index = store.items.findIndex(item => item.id === id);
+  //console.log(index)
+  const itemName = store.items[index].name
+  $('.js-shopping-list-entry').val(`${itemName}`)
+
+}
 
 const toggleCheckedForListItem = function (id) {
   const foundItem = store.items.find(item => item.id === id);
@@ -114,6 +125,18 @@ const deleteListItem = function (id) {
   store.items.splice(index, 1);
 };
 
+const handleItemEditClicked = function (){
+  $('.js-shopping-list').on('click', '.js-item-edit', event =>
+  {
+    const id = getItemIdFromElement(event.currentTarget);
+        console.log(id);
+        itemEdit(id) 
+        deleteListItem(id)
+        render()
+  });
+
+};
+
 const handleDeleteItemClicked = function () {
   // Like in `handleItemCheckClicked`, 
   // we use event delegation.
@@ -121,6 +144,7 @@ const handleDeleteItemClicked = function () {
     // Get the index of the item in store.items.
     const id = getItemIdFromElement(event.currentTarget);
     // Delete the item.
+    console.log(id)
     deleteListItem(id);
     // Render the updated shopping list.
     render();
@@ -158,6 +182,7 @@ const handleShoppingList = function () {
   render();
   handleNewItemSubmit();
   handleItemCheckClicked();
+  handleItemEditClicked();
   handleDeleteItemClicked();
   handleToggleFilterClick();
 };
